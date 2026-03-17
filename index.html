@@ -137,7 +137,22 @@ r.style.display=(age==='all'||a===age)?'':'none';
 }
 
 render();
-</script>
+</fetch('https://docs.google.com/spreadsheets/d/e/2PACX-1vTCXs6_J0WI4khuPG-XLi0Jm4Xg0HKu6jincPkyQSoLme-BAPypkz5gepZfgGgur3oAMBSqsCyAl_G2/pubhtml')
+.then(res => res.text())
+.then(data => {
+  let rows = data.split('\n').slice(1);
+  rows.forEach(r => {
+    let cols = r.split(',');
+    matches.push({
+      t1: cols[0],
+      t2: cols[1],
+      score: cols[2],
+      date: cols[3],
+      age: cols[4]
+    });
+  });
+  render();
+});>
 
 </body>
 </html>
