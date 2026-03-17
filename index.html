@@ -1,1 +1,143 @@
-index.html
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Alexandria Handball</title>
+
+<style>
+body{margin:0;font-family:'Cairo',Arial;background:#f4f6f9;}
+header{background:linear-gradient(90deg,#ff6600,#1e3a8a);color:white;padding:25px;text-align:center;}
+nav{background:#1e3a8a;padding:12px;text-align:center;}
+nav a{color:white;margin:0 10px;text-decoration:none;cursor:pointer;font-weight:bold;}
+section{padding:25px;}
+h2{color:#1e3a8a;}
+.table{width:100%;border-collapse:collapse;background:white;}
+.table th{background:#1e3a8a;color:white;}
+.table th,.table td{padding:10px;border:1px solid #ddd;text-align:center;}
+.btn{background:#ff6600;color:white;padding:8px 12px;border:none;border-radius:8px;cursor:pointer;}
+input,select{padding:8px;margin:5px;border-radius:6px;border:1px solid #ccc;}
+.hidden{display:none;}
+footer{background:#1e3a8a;color:white;text-align:center;padding:15px;}
+</style>
+</head>
+
+<body>
+<header>
+<h1>Alexandria Handball</h1>
+<p>منطقة الإسكندرية لكرة اليد</p>
+</header>
+
+<nav>
+<a onclick="show('about')">عن المنطقة</a>
+<a onclick="show('tables')">الترتيب</a>
+<a onclick="show('matches')">المباريات</a>
+<a onclick="show('admin')">الإدارة</a>
+</nav>
+
+<section id="about">
+<h2>عن المنطقة</h2>
+<p>تطوير كرة اليد بالإسكندرية وتنظيم البطولات لجميع الأعمار.</p>
+</section>
+
+<section id="tables" class="hidden">
+<h2>جدول الترتيب</h2>
+<select onchange="filterAge(this.value)">
+<option value="all">كل الفئات</option>
+<option value="2010">2010</option>
+<option value="2012">2012</option>
+<option value="2014">2014</option>
+<option value="2016">2016</option>
+</select>
+<table class="table" id="teamsTable">
+<tr><th>المركز</th><th>الفريق</th><th>النقاط</th><th>الفئة</th></tr>
+</table>
+</section>
+
+<section id="matches" class="hidden">
+<h2>المباريات</h2>
+<table class="table" id="matchesTable">
+<tr><th>الفريق</th><th>المنافس</th><th>النتيجة</th><th>التاريخ</th><th>الفئة</th></tr>
+</table>
+</section>
+
+<section id="admin" class="hidden">
+<h2>لوحة الإدارة</h2>
+
+<h3>إضافة فريق</h3>
+<input id="teamName" placeholder="اسم الفريق">
+<input id="points" placeholder="النقاط">
+<select id="age">
+<option>2010</option><option>2012</option><option>2014</option><option>2016</option>
+</select>
+<button class="btn" onclick="addTeam()">إضافة</button>
+
+<h3>إضافة مباراة</h3>
+<input id="t1" placeholder="الفريق">
+<input id="t2" placeholder="المنافس">
+<input id="score" placeholder="النتيجة">
+<input id="date" placeholder="التاريخ">
+<select id="mAge">
+<option>2010</option><option>2012</option><option>2014</option><option>2016</option>
+</select>
+<button class="btn" onclick="addMatch()">إضافة</button>
+</section>
+
+<footer>© 2026 Alexandria Handball</footer>
+
+<script>
+let teams=JSON.parse(localStorage.getItem('teams')||'[]');
+let matches=JSON.parse(localStorage.getItem('matches')||'[]');
+
+function save(){
+localStorage.setItem('teams',JSON.stringify(teams));
+localStorage.setItem('matches',JSON.stringify(matches));
+}
+
+function show(id){
+document.querySelectorAll('section').forEach(s=>s.classList.add('hidden'));
+document.getElementById(id).classList.remove('hidden');
+render();
+}
+
+function addTeam(){
+teams.push({name:teamName.value,points:+points.value,age:age.value});
+save();render();
+}
+
+function addMatch(){
+matches.push({t1:t1.value,t2:t2.value,score:score.value,date:date.value,age:mAge.value});
+save();render();
+}
+
+function render(){
+let table=document.getElementById('teamsTable');
+table.innerHTML='<tr><th>المركز</th><th>الفريق</th><th>النقاط</th><th>الفئة</th></tr>';
+let sorted=[...teams].sort((a,b)=>b.points-a.points);
+sorted.forEach((t,i)=>{
+let row=table.insertRow();
+row.innerHTML=`<td>${i+1}</td><td>${t.name}</td><td>${t.points}</td><td>${t.age}</td>`;
+});
+
+let mTable=document.getElementById('matchesTable');
+mTable.innerHTML='<tr><th>الفريق</th><th>المنافس</th><th>النتيجة</th><th>التاريخ</th><th>الفئة</th></tr>';
+matches.forEach(m=>{
+let r=mTable.insertRow();
+r.innerHTML=`<td>${m.t1}</td><td>${m.t2}</td><td>${m.score}</td><td>${m.date}</td><td>${m.age}</td>`;
+});
+}
+
+function filterAge(age){
+let rows=document.querySelectorAll('#teamsTable tr');
+rows.forEach((r,i)=>{
+if(i===0)return;
+let a=r.cells[3].innerText;
+r.style.display=(age==='all'||a===age)?'':'none';
+});
+}
+
+render();
+</script>
+
+</body>
+</html>
